@@ -1,0 +1,15 @@
+{
+"type": "FeatureCollection",
+"name": "penginapan",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "Penginapan": "Yama Resort Tondano", "Kategori": "Hotel", "Latitude": 1.275926754, "Longitude": 124.8859136, "Gambar": "foto_wisata/yama_resort_tondano.jpg" }, "geometry": { "type": "Point", "coordinates": [ 124.8859136, 1.275926754 ] } },
+{ "type": "Feature", "properties": { "Penginapan": "D'88 Resort Tondano", "Kategori": "Hotel", "Latitude": 1.277697573, "Longitude": 124.8811587, "Gambar": "foto_wisata/d88_resort_tondano.jpg" }, "geometry": { "type": "Point", "coordinates": [ 124.8811587, 1.277697573 ] } },
+{ "type": "Feature", "properties": { "Penginapan": "Villa Bella Sulawesi", "Kategori": "Homestay", "Latitude": 1.316069244, "Longitude": 124.9172936, "Gambar": "foto_wisata/villa_bella_sulawesi.jpg" }, "geometry": { "type": "Point", "coordinates": [ 124.9172936, 1.316069244 ] } },
+{ "type": "Feature", "properties": { "Penginapan": "FILADELFIA Resto & Penginapan", "Kategori": "Hotel", "Latitude": 1.287366995, "Longitude": 124.9067698, "Gambar": "foto_wisata/filadelfia_resto_penginapan.jpg" }, "geometry": { "type": "Point", "coordinates": [ 124.9067698, 1.287366995 ] } },
+{ "type": "Feature", "properties": { "Penginapan": "Penginapan Borneo", "Kategori": "Homestay", "Latitude": 1.307609181, "Longitude": 124.9139442, "Gambar": "foto_wisata/penginapan_borneo.jpg" }, "geometry": { "type": "Point", "coordinates": [ 124.9139442, 1.307609181 ] } },
+{ "type": "Feature", "properties": { "Penginapan": "Wale Walanda", "Kategori": "Hotel", "Latitude": 1.278055814, "Longitude": 124.9020486, "Gambar": "foto_wisata/wale_walanda.jpg" }, "geometry": { "type": "Point", "coordinates": [ 124.9020486, 1.278055814 ] } },
+{ "type": "Feature", "properties": { "Penginapan": "Urbanview Hotel Moy Residence Tondano by RedDoorz", "Kategori": "Hotel", "Latitude": 1.267753445, "Longitude": 124.8985018, "Gambar": "foto_wisata/moy.jpg" }, "geometry": { "type": "Point", "coordinates": [ 124.8985018, 1.267753445 ] } },
+{ "type": "Feature", "properties": { "Penginapan": "Hotel Vorel", "Kategori": "Homestay", "Latitude": 1.295466239, "Longitude": 124.9112162, "Gambar": "foto_wisata/hotel_vorel.jpg" }, "geometry": { "type": "Point", "coordinates": [ 124.9112162, 1.295466239 ] } }
+]
+}

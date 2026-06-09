@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+
+<!-- ====================================================== -->
+<!-- META DATA WEBSITE -->
+<!-- Digunakan untuk pengaturan dasar halaman website -->
+<!-- ====================================================== -->
+
+<!-- Mengatur karakter agar support simbol dan huruf khusus -->
+<meta charset="UTF-8">
+
+<!-- Membuat tampilan responsive di HP dan Laptop -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Judul website yang muncul di tab browser -->
+<title>WebGIS Wisata Minahasa</title>
+
+<!-- ====================================================== -->
+<!-- LEAFLET CSS -->
+<!-- Library utama untuk membuat peta interaktif -->
+<!-- ====================================================== -->
+
+<link rel="stylesheet"
+href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+
+<!-- ====================================================== -->
+<!-- MARKER CLUSTER CSS -->
+<!-- Digunakan untuk mengelompokkan marker -->
+<!-- agar tampilan peta lebih rapi -->
+<!-- ====================================================== -->
+
+<link rel="stylesheet"
+href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css"/>
+
+<link rel="stylesheet"
+href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css"/>
+
+<style>
+
+/* ====================================================== */
+/* STYLE DASAR WEBSITE */
+/* Mengatur body website secara keseluruhan */
+/* ====================================================== */
+
+html, body{
+
+    /* Menghilangkan jarak bawaan browser */
+    margin:0;
+
+    /* Menghilangkan padding bawaan browser */
+    padding:0;
+
+    /* Membuat tinggi full layar */
+    height:100%;
+
+    /* Mengatur jenis font website */
+    font-family:Arial, sans-serif;
+}
+
+/* ====================================================== */
+/* STYLE MAP */
+/* Mengatur ukuran peta */
+/* ====================================================== */
+
+#map{
+
+    /* Lebar full layar */
+    width:100%;
+
+    /* Tinggi full layar */
+    height:100vh;
+}
+
+/* ====================================================== */
+/* SIDEBAR */
+/* Panel menu layer di kiri atas */
+/* ====================================================== */
+
+.sidebar{
+
+    /* Posisi absolute agar mengambang di atas peta */
+    position:absolute;
+
+    /* Jarak dari atas */
+    top:15px;
+
+    /* Jarak dari kiri */
+    left:15px;
+
+    /* Agar tampil di atas peta */
+    z-index:1000;
+
+    /* Lebar sidebar */
+    width:280px;
+
+    /* Background putih transparan */
+    background:rgba(255,255,255,0.95);
+
+    /* Efek blur modern */
+    backdrop-filter:blur(10px);
+
+    /* Jarak isi di dalam sidebar */
+    padding:20px;
+
+    /* Membuat sudut membulat */
+    border-radius:20px;
+
+    /* Bayangan sidebar */
+    box-shadow:
+    0 8px 25px rgba(0,0,0,0.3);
+
+    /* Border transparan */
+    border:1px solid rgba(255,255,255,0.3);
+
+    /* Animasi halus */
+    transition:0.3s;
+}
+
+/* ====================================================== */
+/* EFEK HOVER SIDEBAR */
+/* Sidebar sedikit naik saat disentuh mouse */
+/* ====================================================== */
+
+.sidebar:hover{
+
+    transform:translateY(-3px);
+}
+
+/* ====================================================== */
+/* JUDUL SIDEBAR */
+/* ====================================================== */
+
+.sidebar h2{
+
+    /* Menghilangkan margin atas */
+    margin-top:0;
+
+    /* Warna hijau */
+    color:#2e7d32;
+
+    /* Ukuran teks */
+    font-size:40px;
+
+    /* Posisi teks di tengah */
+    text-align:center;
+}
+
+/* ====================================================== */
+/* SUB JUDUL SIDEBAR */
+/* ====================================================== */
+
+.sidebar-sub{
+
+    text-align:center;
+
+    color:#666;
+
+    margin-bottom:25px;
+}
+
+/* ====================================================== */
+/* JUDUL MENU LAYER */
+/* ====================================================== */
+
+.layer-title{
+
+    font-size:20px;
+
+    font-weight:bold;
+
+    margin-bottom:20px;
+}
+
+/* ====================================================== */
+/* ITEM LAYER */
+/* Setiap menu layer */
+/* ====================================================== */
+
+.layer-item{
+
+    /* Mengatur isi horizontal */
+    display:flex;
+
+    /* Posisi item rata tengah */
+    align-items:center;
+
+    /* Jarak antar item */
+    gap:12px;
+
+    /* Jarak bawah */
+    margin-bottom:15px;
+
+    /* Padding dalam item */
+    padding:12px;
+
+    /* Sudut membulat */
+    border-radius:12px;
+
+    /* Animasi */
+    transition:0.2s;
+
+    /* Cursor tangan */
+    cursor:pointer;
+}
+
+/* ====================================================== */
+/* HOVER ITEM LAYER */
+/* Warna berubah saat disentuh mouse */
+/* ====================================================== */
+
+.layer-item:hover{
+
+    background:#f3f3f3;
+}
+
+/* ====================================================== */
+/* ICON PADA MENU LAYER */
+/* ====================================================== */
+
+.layer-item img{
+
+    width:28px;
+    height:28px;
+}
+
+/* ====================================================== */
+/* TEXT PADA MENU LAYER */
+/* ====================================================== */
+
+.layer-item label{
+
+    font-size:18px;
+
+    cursor:pointer;
+}
+
+/* ====================================================== */
+/* CHECKBOX */
+/* ====================================================== */
+
+input[type="checkbox"]{
+
+    /* Membesarkan checkbox */
+    transform:scale(1.3);
+
+    cursor:pointer;
+}
+
+/* ====================================================== */
+/* STYLE GAMBAR POPUP */
+/* ====================================================== */
+
+.popup-img{
+
+    /* Lebar gambar popup */
+    width:250px;
+
+    /* Membulatkan sudut gambar */
+    border-radius:10px;
+
+    /* Jarak atas */
+    margin-top:10px;
+}
+
+/* ====================================================== */
+/* STYLE POPUP LEAFLET */
+/* ====================================================== */
+
+.leaflet-popup-content-wrapper{
+
+    border-radius:15px;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- ====================================================== -->
+<!-- SIDEBAR -->
+<!-- Panel kontrol layer -->
+<!-- ====================================================== -->
+
+<div class="sidebar">
+
+<!-- Judul website -->
+<h2>🌍 Minahasa</h2>
+
+<!-- Deskripsi website -->
+<div class="sidebar-sub">
+WebGIS Pariwisata Kabupaten Minahasa
+</div>
+
+<!-- Judul menu layer -->
+<div class="layer-title">
+Pilih Layer
+</div>
+
+<!-- ====================================================== -->
+<!-- LAYER OBJEK WISATA -->
+<!-- ====================================================== -->
+
+<div class="layer-item">
+
+<!-- Checkbox aktif/nonaktif layer -->
+<input type="checkbox"
+id="wisataCheck"
+checked>
+
+<!-- Icon layer -->
+<img src="icons/alam.png">
+
+<!-- Nama layer -->
+<label>Objek Wisata</label>
+
+</div>
+
+<!-- ====================================================== -->
+<!-- LAYER ATM -->
+<!-- ====================================================== -->
+
+<div class="layer-item">
+
+<input type="checkbox"
+id="atmCheck"
+checked>
+
+<img src="icons/atm.png">
+
+<label>ATM</label>
+
+</div>
+
+<!-- ====================================================== -->
+<!-- LAYER POM BENSIN -->
+<!-- ====================================================== -->
+
+<div class="layer-item">
+
+<input type="checkbox"
+id="pomCheck"
+checked>
+
+<img src="icons/pombensin.png">
+
+<label>Pom Bensin</label>
+
+</div>
+
+<!-- ====================================================== -->
+<!-- LAYER PENGINAPAN -->
+<!-- ====================================================== -->
+
+<div class="layer-item">
+
+<input type="checkbox"
+id="hotelCheck"
+checked>
+
+<img src="icons/penginapan.png">
+
+<label>Penginapan</label>
+
+</div>
+
+<!-- ====================================================== -->
+<!-- LAYER BATAS KABUPATEN -->
+<!-- ====================================================== -->
+
+<div class="layer-item">
+
+<input type="checkbox"
+id="kabupatenCheck"
+checked>
+
+<img src="icons/budaya_sejarah.png">
+
+<label>Batas Kabupaten</label>
+
+</div>
+
+</div>
+
+<!-- ====================================================== -->
+<!-- DIV MAP -->
+<!-- Tempat peta ditampilkan -->
+<!-- ====================================================== -->
+
+<div id="map"></div>
+
+<!-- ====================================================== -->
+<!-- JAVASCRIPT LIBRARY -->
+<!-- ====================================================== -->
+
+<!-- Library utama Leaflet -->
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<!-- Axios digunakan membaca GeoJSON -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.8/axios.min.js"></script>
+
+<!-- Library clustering marker -->
+<script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
+
+<script>
+
+//////////////////////////////////////////////////////
+// MEMBUAT PETA
+// setView digunakan menentukan:
+// 1. titik pusat peta
+// 2. level zoom awal
+//////////////////////////////////////////////////////
+
+var map = L.map('map').setView([1.25,124.90],10);
+
+//////////////////////////////////////////////////////
+// GOOGLE HYBRID
+// Menampilkan:
+// - citra satelit
+// - jalan
+// - nama lokasi
+//////////////////////////////////////////////////////
+
+L.tileLayer(
+'https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',
+{
+    maxZoom:20
+}
+).addTo(map);
+
+//////////////////////////////////////////////////////
+// MEMBUAT ICON
+// Icon berbeda untuk setiap kategori
+//////////////////////////////////////////////////////
+
+var iconAlam = L.icon({
+
+    // Lokasi gambar icon
+    iconUrl:'icons/alam.png',
+
+    // Ukuran icon
+    iconSize:[35,35]
+});
+
+var iconBuatan = L.icon({
+
+    iconUrl:'icons/buatan.png',
+
+    iconSize:[35,35]
+});
+
+var iconBudaya = L.icon({
+
+    iconUrl:'icons/budaya_sejarah.png',
+
+    iconSize:[35,35]
+});
+
+var iconKuliner = L.icon({
+
+    iconUrl:'icons/restaurant.png',
+
+    iconSize:[35,35]
+});
+
+var iconATM = L.icon({
+
+    iconUrl:'icons/atm.png',
+
+    iconSize:[30,30]
+});
+
+var iconPom = L.icon({
+
+    iconUrl:'icons/pombensin.png',
+
+    iconSize:[30,30]
+});
+
+var iconHotel = L.icon({
+
+    iconUrl:'icons/penginapan.png',
+
+    iconSize:[30,30]
+});
+
+//////////////////////////////////////////////////////
+// CLUSTER MARKER
+// Digunakan agar marker tidak bertumpuk
+//////////////////////////////////////////////////////
+
+var wisataCluster = L.markerClusterGroup();
+
+var atmCluster = L.markerClusterGroup();
+
+var pomCluster = L.markerClusterGroup();
+
+var hotelCluster = L.markerClusterGroup();
+
+//////////////////////////////////////////////////////
+// MEMBACA DATA GEOJSON OBJEK WISATA
+//////////////////////////////////////////////////////
+
+axios.get('data/objek_wisata.geojson')
+
+.then(function(response){
+
+    //////////////////////////////////////////////////////
+    // MENGUBAH GEOJSON MENJADI LAYER LEAFLET
+    //////////////////////////////////////////////////////
+
+    var wisataLayer = L.geoJSON(response.data,{
+
+        //////////////////////////////////////////////////////
+        // MENGATUR ICON BERDASARKAN KATEGORI
+        //////////////////////////////////////////////////////
+
+        pointToLayer:function(feature,latlng){
+
+            // Mengambil kategori dari GeoJSON
+            var kategori = feature.properties.Kategori;
+
+            // Variabel icon
+            var iconPilih;
+
+            // Jika kategori Alam
+            if(kategori=="Alam"){
+
+                iconPilih = iconAlam;
+            }
+
+            // Jika kategori Buatan
+            else if(kategori=="Buatan"){
+
+                iconPilih = iconBuatan;
+            }
+
+            // Jika kategori Budaya
+            else if(kategori=="Budaya_Sejarah"){
+
+                iconPilih = iconBudaya;
+            }
+
+            // Jika kategori Kuliner
+            else if(kategori=="Kuliner"){
+
+                iconPilih = iconKuliner;
+            }
+
+            // Jika kategori tidak ditemukan
+            else{
+
+                iconPilih = iconAlam;
+            }
+
+            //////////////////////////////////////////////////////
+            // MEMBUAT MARKER
+            //////////////////////////////////////////////////////
+
+            return L.marker(latlng,{
+                icon:iconPilih
+            });
+
+        },
+
+        //////////////////////////////////////////////////////
+        // MEMBUAT POPUP SETIAP MARKER
+        //////////////////////////////////////////////////////
+
+        onEachFeature:function(feature,layer){
+
+            // Mengambil foto dari GeoJSON
+            var foto = feature.properties.Gambar;
+
+            // Jika foto kosong
+            if(foto == null){
+
+                foto = "";
+            }
+
+            //////////////////////////////////////////////////////
+            // ISI POPUP
+            //////////////////////////////////////////////////////
+
+            // Mengambil data Lokasi dari GeoJSON
+var lokasi =
+feature.properties["Lokasi"] || "Lokasi belum tersedia";
+
+// Mengambil data Deskripsi dari GeoJSON
+var deskripsi =
+feature.properties.Deskripsi || "Deskripsi belum tersedia";
+
+        layer.bindPopup(`
+
+        <center>
+
+        <!-- Nama Wisata -->
+        <h2>
+        ${feature.properties["Objek Wisata"]}
+        </h2>
+
+        <hr>
+
+        <!-- Kategori Wisata -->
+        <b>Kategori :</b>
+
+        <br>
+
+        ${feature.properties.Kategori}
+
+        <br><br>
+
+        <!-- Lokasi Wisata -->
+        <b>Lokasi :</b>
+
+        <br>
+
+        ${lokasi}
+
+        <br><br>
+
+        <!-- Deskripsi Wisata -->
+        <b>Deskripsi :</b>
+
+        <br>
+
+        ${deskripsi}
+
+        <br><br>
+
+        <!-- Foto Wisata -->
+        <img src="${foto}"
+        class="popup-img">
+
+        </center>
+
+        `);
+
+        }
+
+    });
+
+    //////////////////////////////////////////////////////
+    // MENAMBAHKAN LAYER KE CLUSTER
+    //////////////////////////////////////////////////////
+
+    wisataCluster.addLayer(wisataLayer);
+
+    //////////////////////////////////////////////////////
+    // MENAMPILKAN LAYER KE MAP
+    //////////////////////////////////////////////////////
+
+    map.addLayer(wisataCluster);
+
+});
+//////////////////////////////////////////////////////
+// ATM
+//////////////////////////////////////////////////////
+
+axios.get('data/atm.geojson')
+
+.then(function(response){
+
+    var layerATM = L.geoJSON(response.data,{
+
+        pointToLayer:function(feature,latlng){
+
+            return L.marker(latlng,{
+                icon:iconATM
+            });
+
+        },
+
+        onEachFeature:function(feature,layer){
+
+            layer.bindPopup(`
+
+            <center>
+
+            <h3>ATM</h3>
+
+            ${feature.properties.name || "ATM"}
+
+            </center>
+
+            `);
+
+        }
+
+    });
+
+    atmCluster.addLayer(layerATM);
+
+    map.addLayer(atmCluster);
+
+});
+
+//////////////////////////////////////////////////////
+// POM BENSIN
+//////////////////////////////////////////////////////
+
+axios.get('data/pom_bensin.geojson')
+
+.then(function(response){
+
+    var layerPom = L.geoJSON(response.data,{
+
+        pointToLayer:function(feature,latlng){
+
+            return L.marker(latlng,{
+                icon:iconPom
+            });
+
+        },
+
+        onEachFeature:function(feature,layer){
+
+            layer.bindPopup(`
+
+            <center>
+
+            <h3>SPBU</h3>
+
+            ${feature.properties.name || "Pertamina"}
+
+            </center>
+
+            `);
+
+        }
+
+    });
+
+    pomCluster.addLayer(layerPom);
+
+    map.addLayer(pomCluster);
+
+});
+
+//////////////////////////////////////////////////////
+// PENGINAPAN
+//////////////////////////////////////////////////////
+
+axios.get('data/penginapan.geojson')
+
+.then(function(response){
+
+    var layerHotel = L.geoJSON(response.data,{
+
+        pointToLayer:function(feature,latlng){
+
+            return L.marker(latlng,{
+                icon:iconHotel
+            });
+
+        },
+
+        onEachFeature:function(feature,layer){
+
+            var foto = feature.properties.Gambar;
+
+            if(foto == null){
+
+                foto = "";
+            }
+
+            layer.bindPopup(`
+
+            <center>
+
+            <h3>
+
+            ${feature.properties.Penginapan}
+
+            </h3>
+
+            <b>Kategori :</b>
+
+            <br>
+
+            ${feature.properties.Kategori}
+
+            <br><br>
+
+            <img src="${foto}"
+
+            class="popup-img">
+
+            </center>
+
+            `);
+
+        }
+
+    });
+
+    hotelCluster.addLayer(layerHotel);
+
+    map.addLayer(hotelCluster);
+
+});
+
+//////////////////////////////////////////////////////
+// BATAS KABUPATEN
+//////////////////////////////////////////////////////
+
+var batasLayer;
+
+axios.get('data/kabupaten_minahasa.geojson')
+
+.then(function(response){
+
+    batasLayer = L.geoJSON(response.data,{
+
+        style:{
+
+            color:'yellow',
+
+            weight:3,
+
+            fillColor:'green',
+
+            fillOpacity:0.10
+
+        }
+
+    });
+
+    map.addLayer(batasLayer);
+
+});
+
+//////////////////////////////////////////////////////
+// CHECKBOX LAYER
+//////////////////////////////////////////////////////
+
+document.getElementById('wisataCheck')
+
+.addEventListener('change',function(){
+
+    if(this.checked){
+
+        map.addLayer(wisataCluster);
+
+    }
+
+    else{
+
+        map.removeLayer(wisataCluster);
+
+    }
+
+});
+
+document.getElementById('atmCheck')
+
+.addEventListener('change',function(){
+
+    if(this.checked){
+
+        map.addLayer(atmCluster);
+
+    }
+
+    else{
+
+        map.removeLayer(atmCluster);
+
+    }
+
+});
+
+document.getElementById('pomCheck')
+
+.addEventListener('change',function(){
+
+    if(this.checked){
+
+        map.addLayer(pomCluster);
+
+    }
+
+    else{
+
+        map.removeLayer(pomCluster);
+
+    }
+
+});
+
+document.getElementById('hotelCheck')
+
+.addEventListener('change',function(){
+
+    if(this.checked){
+
+        map.addLayer(hotelCluster);
+
+    }
+
+    else{
+
+        map.removeLayer(hotelCluster);
+
+    }
+
+});
+
+document.getElementById('kabupatenCheck')
+
+.addEventListener('change',function(){
+
+    if(this.checked){
+
+        map.addLayer(batasLayer);
+
+    }
+
+    else{
+
+        map.removeLayer(batasLayer);
+
+    }
+
+});
+
+
+</script>
+
+</body>
+</html>
